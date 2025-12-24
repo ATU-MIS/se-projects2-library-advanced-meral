@@ -1,0 +1,27 @@
+sequenceDiagram
+    participant uye
+    participant GUI
+    participant LC
+    participant Loan_service
+    participant BookRepo
+    participant LoanRepo
+    uye->>LC: odunc_a1(isbn)
+    LC->>Loan_service: func()
+    Loan_service->>BookRepo: kitap_getir(param)
+    BookRepo->>Loan_service: kitap
+    Loan_service->>Loan_service: uygun_mu()
+    alt Uygun
+        Loan_service->>LoanRepo: odunc_kaydi_olustur(uye_id,isbn)
+        LoanRepo->>Loan_service: odunc_kaydi()
+        Loan_service->>BookRepo: kitap_durum_guncelle(isbn,oduncte)
+        Loan_service->>LC: basarili
+        LC->>uye: message (odunc islemi tamamlandi)
+    else Gecikmiş kitap VAR
+        Loan_service->>LC: hata (gecikmiş kitap var)
+        LC->>uye: odunc alma islemi reddedildi
+    else Gecikmiş kitap yok
+        Loan_service->>BookRepo: KitapGetir(param)
+        BookRepo->>Loan_service: kitap
+        alt Kitap Stokta yok
+        end
+    end
